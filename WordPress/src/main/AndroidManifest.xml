@@ -518,7 +518,7 @@
             android:label=""
             android:theme="@style/Calypso.NoActionBar" />
         <activity
-            android:name=".ui.giphy.GiphyPickerActivity"
+            android:name=".ui.gifs.GiphyPickerActivity"
             android:theme="@style/Calypso.NoActionBar" />
 
         <!-- Notifications activities -->
