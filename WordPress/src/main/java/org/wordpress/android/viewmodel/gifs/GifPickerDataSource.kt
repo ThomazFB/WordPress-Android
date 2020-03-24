@@ -1,9 +1,9 @@
-package org.wordpress.android.viewmodel.gif
+package org.wordpress.android.viewmodel.gifs
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.paging.PositionalDataSource
-import org.wordpress.android.viewmodel.gif.provider.GifProvider
+import org.wordpress.android.viewmodel.gifs.provider.GifProvider
 
 /**
  * The PagedListDataSource that is created and managed by [GifPickerDataSourceFactory]
