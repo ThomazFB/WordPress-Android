@@ -141,8 +141,15 @@ class GiphyPickerViewModel @Inject constructor(
      * The [PagedList] that should be displayed in the RecyclerView
      */
     val mediaViewModelPagedList: LiveData<PagedList<GiphyMediaViewModel>> by lazy {
-        val pagedListConfig = PagedList.Config.Builder().setEnablePlaceholders(true).setPageSize(30).build()
-        LivePagedListBuilder(dataSourceFactory, pagedListConfig).setBoundaryCallback(pagedListBoundaryCallback).build()
+        val pagedListConfig = PagedList.Config.Builder()
+                .setEnablePlaceholders(false)
+                .setInitialLoadSizeHint(DEFAULT_INITIAL_LOAD_SIZE_HINT)
+                .setPageSize(DEFAULT_PAGE_SIZE)
+                .build()
+
+        LivePagedListBuilder(dataSourceFactory, pagedListConfig)
+                .setBoundaryCallback(pagedListBoundaryCallback)
+                .build()
     }
 
     /**
@@ -344,4 +351,9 @@ class GiphyPickerViewModel @Inject constructor(
      * @see [GiphyPickerDataSource.retryAllFailedRangeLoads]
      */
     fun retryAllFailedRangeLoads() = dataSourceFactory.retryAllFailedRangeLoads()
+
+    companion object {
+        private const val DEFAULT_INITIAL_LOAD_SIZE_HINT = 42
+        private const val DEFAULT_PAGE_SIZE = 21
+    }
 }

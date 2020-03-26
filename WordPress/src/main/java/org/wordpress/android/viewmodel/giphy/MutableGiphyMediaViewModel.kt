@@ -14,7 +14,7 @@ import org.wordpress.android.viewmodel.SingleLiveEvent
  *
  * The [GiphyPickerViewHolder] should never have access to the mutating methods of this class.
  */
-class MutableGiphyMediaViewModel(
+data class MutableGiphyMediaViewModel(
     override val id: String,
     override val thumbnailUri: Uri,
     override val previewImageUri: Uri,

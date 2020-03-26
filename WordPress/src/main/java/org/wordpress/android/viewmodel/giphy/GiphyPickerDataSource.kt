@@ -3,6 +3,7 @@ package org.wordpress.android.viewmodel.giphy
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.paging.PositionalDataSource
+import org.wordpress.android.viewmodel.giphy.provider.GifProvider
 
 /**
  * The PagedListDataSource that is created and managed by [GiphyPickerDataSourceFactory]
@@ -11,6 +12,7 @@ import androidx.paging.PositionalDataSource
  * [searchQuery] is changed by the user.
  */
 class GiphyPickerDataSource(
+    private val gifProvider: GifProvider,
     private val searchQuery: String
 ) : PositionalDataSource<GiphyMediaViewModel>() {
     /**
@@ -65,13 +67,38 @@ class GiphyPickerDataSource(
         initialLoadError = null
         _rangeLoadErrorEvent.postValue(null)
 
-        // Do not do any API call if the [searchQuery] is empty
-        if (searchQuery.isBlank()) {
-            callback.onResult(emptyList(), startPosition, 0)
-            return
+        when {
+            // Do not do any API call if the [searchQuery] is empty
+            searchQuery.isBlank() -> callback.onResult(emptyList(), startPosition, 0)
+            else -> requestInitialSearch(params, callback)
         }
+    }
 
-        callback.onResult(emptyList(), startPosition, 0)
+    /**
+     * Basic search request handling to initialize the list for the loadInitial function
+     *
+     * If no next position is informed by the GIF provider, the total count will be set with the size of the GIF list
+     */
+    private fun requestInitialSearch(
+        params: LoadInitialParams,
+        callback: LoadInitialCallback<GiphyMediaViewModel>
+    ) {
+        val startPosition = 0
+        gifProvider.search(searchQuery, startPosition, params.requestedLoadSize,
+                onSuccess = { gifs, nextPosition ->
+                    val totalCount = when {
+                        // nextPosition should never be smaller than the number of GIFs returned
+                        nextPosition == null || nextPosition < gifs.size -> gifs.size
+                        else -> nextPosition
+                    }
+
+                    callback.onResult(gifs, startPosition, totalCount)
+                },
+                onFailure = {
+                    initialLoadError = it
+                    callback.onResult(emptyList(), startPosition, 0)
+                }
+        )
     }
 
     /**
@@ -81,7 +108,15 @@ class GiphyPickerDataSource(
      * automatically retried using [retryAllFailedRangeLoads].
      */
     override fun loadRange(params: LoadRangeParams, callback: LoadRangeCallback<GiphyMediaViewModel>) {
-        // Logic removed for now.
+        gifProvider.search(searchQuery, params.startPosition, params.loadSize,
+                onSuccess = { gifs, _ ->
+                    callback.onResult(gifs)
+                    retryAllFailedRangeLoads()
+                },
+                onFailure = {
+                    failedRangeLoadArguments.add(RangeLoadArguments(params, callback))
+                    if (_rangeLoadErrorEvent.value == null) _rangeLoadErrorEvent.value = it
+                })
     }
 
     /**
