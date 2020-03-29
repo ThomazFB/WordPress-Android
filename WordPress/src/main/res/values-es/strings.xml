@@ -582,12 +582,12 @@ Language: es
     <string name="stats_insights_view_more">Ver más</string>
     <string name="stats_insights_share_post">Compartir entrada</string>
     <string name="stats_insights_create_post">Crear entrada</string>
-    <string name="giphy_powered_by_giphy">Creado por GIPHY</string>
-    <string name="giphy_picker_endless_scroll_network_error">Algunos medios no se cargaron debido a un error de red.</string>
-    <string name="giphy_picker_empty_search_list">Ningún medio coincide con tu búsqueda</string>
-    <string name="giphy_picker_search_hint">Buscar en Giphy</string>
+    <string name="gif_powered_by_tenor">Creado por TENOR</string>
+    <string name="gif_picker_endless_scroll_network_error">Algunos medios no se cargaron debido a un error de red.</string>
+    <string name="gif_picker_empty_search_list">Ningún medio coincide con tu búsqueda</string>
+    <string name="gif_picker_search_hint">Buscar en Tenor</string>
     <string name="stats_insights_latest_post_message">Han pasado %1$s desde que se publicó %2$s. Así es como ha funcionado la entrada hasta ahora:</string>
-    <string name="giphy_picker_initial_empty_text">¡Busca para encontrar GIF para añadir a tu biblioteca de medios!</string>
+    <string name="gif_picker_initial_empty_text">¡Busca para encontrar GIF para añadir a tu biblioteca de medios!</string>
     <string name="stats_insights_tags_and_categories">Etiquetas y categorías</string>
     <string name="stats_insights_latest_post_with_no_engagement">Han pasado %1$s desde que se publicó %2$s. Pon la bola a rodar y aumenta las vistas de las entradas compartiendo tu entrada:</string>
     <string name="stats_insights_latest_post_empty">Aún no has publicado ninguna entrada. Una vez que empieces a publicar, el resumen de tu última entrada aparecerá aquí:</string>

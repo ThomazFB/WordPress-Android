@@ -554,11 +554,11 @@ Language: de
     <string name="stats_no_data_for_period">Keine Daten für diesen Zeitraum</string>
     <string name="preference_strip_image_location">Positionsangabe von Medien entfernen</string>
     <string name="stats_cannot_be_started">Wir können die Statistiken momentan nicht öffnen. Bitte versuche es später erneut</string>
-    <string name="giphy_powered_by_giphy">Bereitgestellt von GIPHY</string>
-    <string name="giphy_picker_endless_scroll_network_error">Einige Medien konnten aufgrund eines Netzwerkfehlers nicht geladen werden.</string>
-    <string name="giphy_picker_empty_search_list">Keine Medien entsprechen deiner Suche</string>
-    <string name="giphy_picker_initial_empty_text">Suche nach GIFs, die du deiner Mediathek hinzufügen kannst!</string>
-    <string name="giphy_picker_search_hint">Giphy durchsuchen</string>
+    <string name="gif_powered_by_tenor">Bereitgestellt von TENOR</string>
+    <string name="gif_picker_endless_scroll_network_error">Einige Medien konnten aufgrund eines Netzwerkfehlers nicht geladen werden.</string>
+    <string name="gif_picker_empty_search_list">Keine Medien entsprechen deiner Suche</string>
+    <string name="gif_picker_initial_empty_text">Suche nach GIFs, die du deiner Mediathek hinzufügen kannst!</string>
+    <string name="gif_picker_search_hint">Tenor durchsuchen</string>
     <string name="stats_author_views_label">Aufrufe</string>
     <string name="stats_author_label">Autor</string>
     <string name="stats_authors">Autoren</string>
