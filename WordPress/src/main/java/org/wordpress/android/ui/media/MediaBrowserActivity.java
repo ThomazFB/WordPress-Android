@@ -64,7 +64,7 @@ import org.wordpress.android.fluxc.store.SiteStore.OnSiteChanged;
 import org.wordpress.android.ui.ActivityId;
 import org.wordpress.android.ui.ActivityLauncher;
 import org.wordpress.android.ui.RequestCodes;
-import org.wordpress.android.ui.giphy.GiphyPickerActivity;
+import org.wordpress.android.ui.gif.GifPickerActivity;
 import org.wordpress.android.ui.media.MediaGridFragment.MediaFilter;
 import org.wordpress.android.ui.media.MediaGridFragment.MediaGridListener;
 import org.wordpress.android.ui.media.services.MediaDeleteService;
@@ -485,8 +485,8 @@ public class MediaBrowserActivity extends AppCompatActivity implements MediaGrid
                 break;
             case RequestCodes.GIF_PICKER:
                 if (resultCode == RESULT_OK
-                    && data.hasExtra(GiphyPickerActivity.KEY_SAVED_MEDIA_MODEL_LOCAL_IDS)) {
-                    int[] mediaLocalIds = data.getIntArrayExtra(GiphyPickerActivity.KEY_SAVED_MEDIA_MODEL_LOCAL_IDS);
+                    && data.hasExtra(GifPickerActivity.KEY_SAVED_MEDIA_MODEL_LOCAL_IDS)) {
+                    int[] mediaLocalIds = data.getIntArrayExtra(GifPickerActivity.KEY_SAVED_MEDIA_MODEL_LOCAL_IDS);
 
                     ArrayList<MediaModel> mediaModels = new ArrayList<>();
                     for (int localId : mediaLocalIds) {
