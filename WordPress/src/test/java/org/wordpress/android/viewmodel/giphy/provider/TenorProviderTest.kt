@@ -10,8 +10,8 @@ import com.tenor.android.core.constant.MediaFilter
 import com.tenor.android.core.network.ApiClient
 import com.tenor.android.core.network.ApiService.Builder
 import com.tenor.android.core.network.IApiClient
-import com.tenor.android.core.response.WeakRefCallback
 import com.tenor.android.core.response.impl.GifsResponse
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Assert.fail
 import org.junit.Before
@@ -29,6 +29,8 @@ import org.wordpress.android.viewmodel.giphy.provider.GifProvider.GifRequestFail
 import org.wordpress.android.viewmodel.giphy.provider.TenorProviderTestFixtures.expectedGifMediaViewModelCollection
 import org.wordpress.android.viewmodel.giphy.provider.TenorProviderTestFixtures.mockedTenorResult
 import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 @Config(application = TestApplication::class)
 @RunWith(RobolectricTestRunner::class)
@@ -37,9 +39,11 @@ class TenorProviderTest {
 
     @Mock lateinit var gifSearchCall: Call<GifsResponse>
 
+    @Mock lateinit var callbackResponse: Response<GifsResponse>
+
     @Mock lateinit var gifResponse: GifsResponse
 
-    @Captor lateinit var callbackCaptor: ArgumentCaptor<WeakRefCallback<Context, GifsResponse>>
+    @Captor lateinit var callbackCaptor: ArgumentCaptor<Callback<GifsResponse>>
 
     private lateinit var tenorProviderUnderTest: TenorProvider
 
@@ -58,6 +62,8 @@ class TenorProviderTest {
 
         val gifResults = mockedTenorResult
         whenever(gifResponse.results).thenReturn(gifResults)
+        whenever(gifResponse.next).thenReturn("0")
+        whenever(callbackResponse.body()).thenReturn(gifResponse)
 
         tenorProviderUnderTest = TenorProvider(context, apiClient)
     }
@@ -65,7 +71,6 @@ class TenorProviderTest {
     @Test
     fun `search call should invoke onSuccess with expected GIF list and nextPosition for valid query`() {
         var onSuccessWasCalled = false
-        whenever(gifResponse.next).thenReturn("0")
 
         tenorProviderUnderTest.search("test",
                 0,
@@ -79,14 +84,13 @@ class TenorProviderTest {
 
         verify(gifSearchCall, times(1)).enqueue(callbackCaptor.capture())
         val capturedCallback = callbackCaptor.value
-        capturedCallback.success(ApplicationProvider.getApplicationContext(), gifResponse)
+        capturedCallback.onResponse(gifSearchCall, callbackResponse)
         assertThat(onSuccessWasCalled).isTrue()
     }
 
     @Test
     fun `search call should invoke onSuccess with expected nextPosition for a valid query`() {
         var onSuccessWasCalled = false
-        whenever(gifResponse.next).thenReturn("0")
         val expectedNextPosition = 0
 
         tenorProviderUnderTest.search("test",
@@ -101,7 +105,7 @@ class TenorProviderTest {
 
         verify(gifSearchCall, times(1)).enqueue(callbackCaptor.capture())
         val capturedCallback = callbackCaptor.value
-        capturedCallback.success(ApplicationProvider.getApplicationContext(), gifResponse)
+        capturedCallback.onResponse(gifSearchCall, callbackResponse)
         assertThat(onSuccessWasCalled).isTrue()
     }
 
@@ -122,13 +126,14 @@ class TenorProviderTest {
 
         verify(gifSearchCall, times(1)).enqueue(callbackCaptor.capture())
         val capturedCallback = callbackCaptor.value
-        capturedCallback.failure(ApplicationProvider.getApplicationContext(), RuntimeException("Expected message"))
+        capturedCallback.onFailure(gifSearchCall, RuntimeException("Expected message"))
         assertThat(onFailureWasCalled).isTrue()
     }
 
     @Test
     fun `search call should invoke onFailure when null GifResponse is returned`() {
         var onFailureWasCalled = false
+        whenever(callbackResponse.body()).thenReturn(null)
 
         tenorProviderUnderTest.search("test",
                 0,
@@ -143,7 +148,7 @@ class TenorProviderTest {
 
         verify(gifSearchCall, times(1)).enqueue(callbackCaptor.capture())
         val capturedCallback = callbackCaptor.value
-        capturedCallback.success(ApplicationProvider.getApplicationContext(), null)
+        capturedCallback.onResponse(gifSearchCall, callbackResponse)
         assertThat(onFailureWasCalled).isTrue()
     }
 

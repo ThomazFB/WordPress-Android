@@ -8,12 +8,14 @@ import com.tenor.android.core.constant.MediaFilter
 import com.tenor.android.core.model.impl.Result
 import com.tenor.android.core.network.ApiClient
 import com.tenor.android.core.network.IApiClient
-import com.tenor.android.core.response.WeakRefCallback
 import com.tenor.android.core.response.impl.GifsResponse
 import org.wordpress.android.R.string
 import org.wordpress.android.viewmodel.giphy.GiphyMediaViewModel
 import org.wordpress.android.viewmodel.giphy.MutableGiphyMediaViewModel
 import org.wordpress.android.viewmodel.giphy.provider.GifProvider.GifRequestFailedException
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 /**
  * Implementation of a GifProvider using the Tenor GIF API as provider
@@ -21,13 +23,20 @@ import org.wordpress.android.viewmodel.giphy.provider.GifProvider.GifRequestFail
  * This Provider performs requests to the Tenor API using the [tenorClient].
  */
 
-internal class TenorProvider @JvmOverloads constructor(
+internal class TenorProvider constructor(
     val context: Context,
     private val tenorClient: IApiClient
 ) : GifProvider {
     /**
      * Implementation of the [GifProvider] search method, it will call the Tenor client search
      * right away with the provided parameters.
+     *
+     * If the search request succeeds an [List] of [MutableGiphyMediaViewModel] will be passed with the next position
+     * for pagination. If there's no next position provided, it will be passed as null.
+     *
+     * If the search request fails an [GifRequestFailedException] will be passed with the API
+     * message. If there's no message provided, a generic message will be applied.
+     *
      */
     override fun search(
         query: String,
@@ -36,96 +45,68 @@ internal class TenorProvider @JvmOverloads constructor(
         onSuccess: (List<GiphyMediaViewModel>, Int?) -> Unit,
         onFailure: (Throwable) -> Unit
     ) {
-        tenorClient.simpleSearch(
+        tenorClient.enqueueSearchRequest(
                 query,
                 position.toString(),
                 loadSize,
                 onSuccess = { response ->
-                    handleResponse(response, onSuccess)
+                    val gifList = response.results.map { it.toMutableGifMediaViewModel() }
+                    val nextPosition = response.next.toIntOrNull()
+                    onSuccess(gifList, nextPosition)
                 },
                 onFailure = {
-                    it?.let { throwable -> handleFailure(throwable, onFailure) }
+                    val errorMessage = it?.message ?: context.getString(string.gifs_list_search_returned_unknown_error)
+                    onFailure(GifRequestFailedException(errorMessage))
                 }
         )
     }
 
     /**
-     * This method act as a simplification to call a search within the Tenor API and the callback
-     * creation
-     * [MediaFilter] must be BASIC or the returned Media will not have a displayable thumbnail
-     * All other provided parameters are set following the Tenor API Documentation
+     * The [onSuccess] will be called if the response is not null
      *
      * The [onFailure] will be called assuming that no valid GIF was found
      * or that a direct failure was found by Tenor API
      *
      * Method is inlined for better high-order functions performance
      */
-    private inline fun IApiClient.simpleSearch(
+    private inline fun IApiClient.enqueueSearchRequest(
         query: String,
         position: String,
         loadSize: Int?,
         crossinline onSuccess: (GifsResponse) -> Unit,
         crossinline onFailure: (Throwable?) -> Unit
-    ) {
-        search(
-                ApiClient.getServiceIds(context),
-                query,
-                loadSize.fittedToMaximumAllowed,
-                position,
-                MediaFilter.BASIC,
-                AspectRatioRange.ALL
-
-        ).enqueue(object : WeakRefCallback<Context, GifsResponse>(context) {
-            override fun success(context: Context, response: GifsResponse?) {
-                response?.let(onSuccess)
-                        ?: onFailure(
-                                GifRequestFailedException(
-                                        context.getString(string.giphy_picker_empty_search_list)
-                                )
-                        )
+    ) = buildSearchCall(query, loadSize, position).apply {
+        enqueue(object : Callback<GifsResponse> {
+            override fun onResponse(call: Call<GifsResponse>, response: Response<GifsResponse>) {
+                val defaultErrorMessage = context.getString(string.giphy_picker_empty_search_list)
+                response.body()?.let(onSuccess) ?: onFailure(GifRequestFailedException(defaultErrorMessage))
             }
 
-            override fun failure(context: Context, throwable: Throwable?) {
+            override fun onFailure(call: Call<GifsResponse>, throwable: Throwable) {
                 onFailure(throwable)
             }
         })
     }
 
     /**
-     * If the search request succeeds an [List] of [MutableGiphyMediaViewModel] will be passed with the next position
-     * for pagination. If there's no next position provided, it will be passed as null.
+     * This method act as a simplification to call a search within the Tenor API and the callback
+     * creation
      *
-     * Method is inlined for better high-order functions performance
+     * [MediaFilter] must be BASIC or the returned Media will not have a displayable thumbnail
+     * All other provided parameters are set following the Tenor API Documentation
      */
-    private inline fun handleResponse(
-        response: GifsResponse,
-        onSuccess: (List<GiphyMediaViewModel>, Int?) -> Unit
-    ) {
-        response.results.map { it.toMutableGifMediaViewModel() }
-                .let { gifs ->
-                    val nextPosition = response.next.toIntOrNull()
-                    onSuccess(gifs, nextPosition)
-                }
-    }
-
-    /**
-     * If the search request fails an [GifRequestFailedException] will be passed with the API
-     * message. If there's no message provided, a generic message will be applied.
-     *
-     * Method is inlined for better high-order functions performance
-     */
-    private inline fun handleFailure(
-        throwable: Throwable,
-        onFailure: (Throwable) -> Unit
-    ) {
-        throwable.message?.let { message ->
-            onFailure(GifRequestFailedException(message))
-        } ?: onFailure(
-                GifRequestFailedException(
-                        context.getString(string.gifs_list_search_returned_unknown_error)
-                )
-        )
-    }
+    private fun IApiClient.buildSearchCall(
+        query: String,
+        loadSize: Int?,
+        position: String
+    ) = search(
+            ApiClient.getServiceIds(context),
+            query,
+            loadSize.fittedToMaximumAllowed,
+            position,
+            MediaFilter.BASIC,
+            AspectRatioRange.ALL
+    )
 
     /**
      * Every GIF returned by the Tenor will be available as [Result], to better interface
