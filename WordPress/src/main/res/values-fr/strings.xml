@@ -552,11 +552,6 @@ Language: fr
     <string name="stats_no_data_for_period">Aucune donnée pour cette période</string>
     <string name="preference_strip_image_location">Supprimer les données de localisation des photos et vidéos</string>
     <string name="stats_cannot_be_started">Nous ne pouvons pas ouvrir les statistiques pour le moment. Veuillez réessayer plus tard</string>
-    <string name="gif_powered_by_tenor">Optimisé par TENOR</string>
-    <string name="gif_picker_endless_scroll_network_error">Échec de chargement de certains médias à cause d’une erreur réseau.</string>
-    <string name="gif_picker_empty_search_list">Aucun média ne correspond à votre recherche.</string>
-    <string name="gif_picker_initial_empty_text">Recherchez des GIF à ajouter à votre bibliothèque de médias !</string>
-    <string name="gif_picker_search_hint">Rechercher Tenor</string>
     <string name="stats_author_views_label">Vues</string>
     <string name="stats_author_label">Auteur</string>
     <string name="stats_authors">Auteurs</string>
