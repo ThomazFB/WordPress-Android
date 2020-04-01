@@ -101,11 +101,9 @@ Language: cs_CZ
     <string name="stats_author_label">Autor</string>
     <string name="stats_authors">Autoři</string>
     <string name="stats_videos_views_label">Zobrazení</string>
-    <string name="giphy_powered_by_giphy">Powered by GIPHY</string>
     <string name="stats_insights_view_more">Zobrazit více</string>
     <string name="stats_insights_share_post">Sdílet příspěvek</string>
     <string name="stats_insights_create_post">Vytvořit příspěvek</string>
-    <string name="giphy_picker_search_hint">Prohledat Giphy</string>
     <string name="stats_search_terms_label">Hledaný výraz</string>
     <string name="stats_search_terms">Hledaný výrazy</string>
     <string name="stats_clicks_label">Kliknutí</string>
