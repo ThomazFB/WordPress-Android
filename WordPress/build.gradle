@@ -66,7 +66,7 @@ android {
         testInstrumentationRunner 'org.wordpress.android.WordPressTestRunner'
 
         buildConfigField "boolean", "OFFER_GUTENBERG", "true"
-        buildConfigField "boolean", "TENOR_AVAILABLE", "false"
+        buildConfigField "boolean", "TENOR_AVAILABLE", "true"
     }
 
     // Gutenberg's dependency - react-native-video is using
@@ -87,6 +87,7 @@ android {
             }
             versionCode 837
             buildConfigField "boolean", "ME_ACTIVITY_AVAILABLE", "false"
+            buildConfigField "boolean", "TENOR_AVAILABLE", "false"
         }
 
         zalpha { // alpha version - enable experimental features
@@ -98,7 +99,6 @@ android {
         wasabi { // "hot" version, can be installed along release, alpha or beta versions
             applicationId "org.wordpress.android.beta"
             dimension "buildType"
-            buildConfigField "boolean", "TENOR_AVAILABLE", "true"
         }
     }
 
